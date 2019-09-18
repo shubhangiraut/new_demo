@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html>
+<head>
+   <title>students api</title>
+   <style>
+      th, td, p, input {
+          font:14px Verdana;
+      }
+      table, th, td 
+      {
+          border: solid 1px #DDD;
+          border-collapse: collapse;
+          padding: 2px 3px;
+          text-align: center;
+      }
+      th {
+          font-weight:bold;
+      }
+  </style>
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+   <script >
+$(document).ready(function()
+{
+$("#login").click(function() 
+  { 
+    alert('INSIDE');
+        var username = $("#username").val();
+        var email = $("#email").val();
+        var password = $("#password").val();
+        var url = "/api/v1/rest-auth/login/";
+        var $crf_token = '{{ csrf_token }}';
+        console.log("url:",  url);
+        var data = ({
+                    'username':username,
+                    'email':email ,
+                    'password' : password
+                  });
+  //onclick function
+        $.ajax({
+                  type: 'POST',
+                  url: url,
+                  data: JSON.stringify(data),
+                  contentType: "application/json; charset=utf-8",
+                  headers:{"X-CSRFToken": $crf_token},
+                  dataType: "json",
+                  crossDomain: true,
+                  async : false,
+                  success: function(data) {
+                        alert(data);
+                        document.write(JSON.stringify(data))
+                        var key = data['key']
+                        document.write(key)
+                        console.log("Data from success section", data);
+                        if(key != null && key != '')
+                        {              
+                                var url = "/users";
+                                alert(data)
+                                document.write(data)
+                                $.ajax({
+                                        type: 'GET',
+                                        url: url,
+                                        contentType: "application/json; charset=utf-8",
+                                        dataType: "json",
+                                        crossDomain: true,
+                                        async : true,
+                                        success: function (data) {
+                                          console.log("Data from success section", data);
+                                          alert(data);
+                                          var data1 = data
+                                          CreateTableFromJSON(data1);
+                                          // document.write(json.stringify(data1));
+                                        },
+                                        error: function (data) {
+                                            callback(data);
+                                            console.log(data)
+                                            console.log("shubhangi")
+                                        }})
+                  function CreateTableFromJSON(data1)
+                  {
+                            var col = [];
+                            for (var i = 0; i < data1.length; i++)
+                            {
+                                for (var key in data1[i])
+                                {
+                                    if (col.indexOf(key) === -1) 
+                                    {
+                                        col.push(key);
+                                    }
+                                  }
+                                }
+
+                  var table = document.createElement("table");
+                  var tr = table.insertRow(-1);
+                  for (var i = 0; i < col.length; i++) 
+                  {
+                      var th = document.createElement("th");     
+                      th.innerHTML = col[i];
+                      tr.appendChild(th);
+                  }
+                  for (var i = 0; i < data1.length; i++) 
+                  {
+                      tr = table.insertRow(-1);
+                      for (var j = 0; j < col.length; j++)
+                       {
+                          var tabCell = tr.insertCell(-1);
+                          tabCell.innerHTML = data1[i][col[j]];
+                      }
+                  }
+                  var divContainer = document.getElementById("showdata");
+                  console.log(divContainer)
+                  console.log(table);
+                  var divContainer = document.getElementById("showdata");
+                  divContainer.innerHTML = "";
+                  divContainer.appendChild(table);
+                  // if(divContainer != null) divContainer.appendChild(table);
+                  // divContainer.appendChild(".")
+                  // r.appendChild(table);
+                }
+            }},
+                  error: function(data) {
+                      console.log("Data from success section ERROR");
+                      console.log(data);
+                      console.log("working fine");
+            }
+      }
+      ) 
+      console.log("END OF AJAX CALL");
+})
+})   
+// create table function
+// function CreateTableFromJSON(data1)
+//                   {
+//                             var col = [];
+//                             for (var i = 0; i < data1.length; i++)
+//                             {
+//                                 for (var key in data1[i])
+//                                 {
+//                                     if (col.indexOf(key) === -1) 
+//                                     {
+//                                         col.push(key);
+//                                     }
+//                                   }
+//                                 }
+
+//                   var table = document.createElement("table");
+//                   var tr = table.insertRow(-1);
+//                   for (var i = 0; i < col.length; i++) 
+//                   {
+//                       var th = document.createElement("th");     
+//                       th.innerHTML = col[i];
+//                       tr.appendChild(th);
+//                   }
+//                   for (var i = 0; i < data1.length; i++) 
+//                   {
+//                       tr = table.insertRow(-1);
+//                       for (var j = 0; j < col.length; j++)
+//                        {
+//                           var tabCell = tr.insertCell(-1);
+//                           tabCell.innerHTML = data1[i][col[j]];
+//                       }
+//                   }
+//                   var divContainer = document.getElementById("showdata");
+//                   divContainer.innerHTML = "";
+//                   divContainer.appendChild(table);
+//                 }
+  //logout function  
+  $(document).ready(function()
+    {
+      $("#logout").click(function() 
+      {
+        $.ajax({
+          url: '/api/v1/rest-auth/logout/',
+          type: 'POST',
+          contentType: 'application/json; charset=utf-8',
+          success: function (response) {
+              alert(response.status);
+              document.write("successfully logout");
+          },
+          error: function () {
+              alert("error");
+          }
+       })
+     })
+  })
+
+  $(document).ready(function(){
+    var main_data;
+    $('#apireq').click(function(){
+          var url = "/users";
+          $.ajax({
+              type: 'get',
+              url: url,
+              contentType: "application/json; charset=utf-8",
+              dataType: "json",
+              crossDomain: true,
+              async : true,
+              success: function (data) {
+                var data1 = data
+                CreateTableFromJSON(data1);
+              },
+              error: function (data) {
+                  callback(data);
+                  console.log(data)
+                  console.log("shubhangi")
+              }
+           })
+function CreateTableFromJSON(data1)
+                  {
+                    print("working well ")
+                            var col = [];
+                            for (var i = 0; i < data1.length; i++)
+                            {
+                                for (var key in data1[i])
+                                {
+                                    if (col.indexOf(key) === -1) 
+                                    {
+                          
+                                        col.push(key);
+                                    }
+                                  }
+                                }
+
+                  var table = document.createElement("table");
+                  var tr = table.insertRow(-1);
+
+                  for (var i = 0; i < col.length; i++) 
+                  {
+                      var th = document.createElement("th");     
+                      th.innerHTML = col[i];
+                      tr.appendChild(th);
+                  }
+        
+                  for (var i = 0; i < data1.length; i++) 
+                  {
+                      tr = table.insertRow(-1);
+                      for (var j = 0; j < col.length; j++)
+                       {
+                          var tabCell = tr.insertCell(-1);
+                          tabCell.innerHTML = data1[i][col[j]];
+                      }
+                  }
+                  var divContainer = document.getElementById("showdata");
+                  divContainer.innerHTML = "";
+                  divContainer.appendChild(table);
+                }
+           }
+        )
+  })    
+</script>
+</head>
+<body>
+  <div>
+      <form method="POST" id ="myform">
+          {% csrf_token %}
+          <div class="imgcontainer">
+          </div>
+          <div class="container">
+            <label for="uname"><b>Username</b></label>
+            <input id = "username" type="text" placeholder="Enter Username" name="username" required>
+        
+            <label for="psw"><b>Password</b></label>
+            <input id = "password"  type="text"  placeholder="Enter Password" name="password" required>
+
+            <label for="email"><b>Email</b></label>
+            <input id = "email"  type="text"  placeholder="Enter Email" name="email" required>
+        
+            <button id="login" type="button" >Login</button>
+          </div>
+          <div class="container" style="background-color:#f1f1f1">
+            <button id = "logout" onclick="userinfo.html"  type="button">Logout</button>
+            <!-- <button onclick="location.href = 'www.yoursite.com';" -->
+          </div>
+        </form>
+    <button id="apireq" >click me </button>
+    <p id = "showdata"></p>
+    <p id = "listdata"></p>
+    <div class="container"><div class="page-header"><h1>Token Sample</h1></div></div>
+    <button type="button" class="btn btn-primary" onclick="begin()">Generate Token</button>
+    <div class="well well-lg" id="textArea"></div>
+  
+    </div> 
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- // CLICK ME FUNCTION CALL DISPLAY TABLE 
+  //  $(document).ready(function(){
+  //   var main_data;
+  //   $('#apireq').click(function(){
+  //         var url = "/users";
+  //         $.ajax({
+  //             type: 'GET',
+  //             url: url,
+  //             contentType: "application/json; charset=utf-8",
+  //             dataType: "json",
+  //             crossDomain: true,
+  //             async : true,
+  //             success: function (data) {
+  //               var data1 = data
+  //               CreateTableFromJSON(data1);
+  //             },
+  //             error: function (data) {
+  //                 callback(data);
+  //                 console.log(data)
+  //                 console.log("shubhangi")
+  //             }
+  //          }) -->
+
+
+<!-- 
+
+// FUNCTION FOR AUTHENTICATION
+// function createAuthToken(baseRestURL, username, password, callback) {
+//     var APIPath = "/api/v1/rest-auth/login";
+//     var completeRestURL = baseRestURL + APIPath;
+//     console.log("REST API URL: " + completeRestURL);
+
+//     var method = "POST";
+//     var postData = "{\"username\": \"" + username + "\",\"password\": \"" + password + "\",\"loginMode\": 1,\"applicationType\": 35}";
+//     var url = completeRestURL;
+//     var async = true;
+//     var request = new XMLHttpRequest();
+//     request.onload = function() {
+//         console.log("ONLOAD");
+//         var status = request.status; // HTTP response status, e.g., 200 for "200 OK"
+//         console.log(status);
+//         var token = request.getResponseHeader("x-mstr-authtoken");
+//         return callback(token);
+//     }
+//     request.open(method, url, async);
+//     request.setRequestHeader("Content-Type", "application/json");
+//     request.setRequestHeader("Accept", "application/json");
+//     request.send(postData);
+// } -->
